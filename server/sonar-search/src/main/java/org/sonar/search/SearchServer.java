@@ -21,9 +21,12 @@ package org.sonar.search;
 
 import org.apache.lucene.util.StringHelper;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonar.process.Jmx;
 import org.sonar.process.MinimumViableSystem;
 import org.sonar.process.Monitored;
@@ -31,6 +34,8 @@ import org.sonar.process.ProcessEntryPoint;
 import org.sonar.process.Props;
 
 public class SearchServer implements Monitored {
+  // VisibleForTesting
+  protected static Logger LOGGER = LoggerFactory.getLogger(SearchServer.class);
 
   private final EsSettings settings;
   private Node node;
@@ -45,7 +50,14 @@ public class SearchServer implements Monitored {
   public void start() {
     Jmx.register(EsSettingsMBean.OBJECT_NAME, settings);
     initBootstrap();
-    node = NodeBuilder.nodeBuilder().settings(settings.build()).build();
+    Settings esSettings = settings.build();
+    if (esSettings.getAsInt("discovery.zen.minimum_master_nodes", 1) >= 2) {
+      LOGGER.info("Elasticsearch is waiting {} for {} node(s) to be up to start.",
+        esSettings.get("discovery.initial_state_timeout"),
+        esSettings.get("discovery.zen.minimum_master_nodes")
+      );
+    }
+    node = NodeBuilder.nodeBuilder().settings(esSettings).build();
     node.start();
   }
 
