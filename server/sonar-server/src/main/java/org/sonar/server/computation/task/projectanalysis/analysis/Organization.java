@@ -29,11 +29,13 @@ public class Organization {
   private final String uuid;
   private final String key;
   private final String name;
+  private final boolean newProjectPrivate;
 
-  private Organization(String uuid, String key, String name) {
+  private Organization(String uuid, String key, String name, boolean newProjectPrivate) {
     this.uuid = requireNonNull(uuid, "uuid can't be null");
     this.key = requireNonNull(key, "key can't be null");
     this.name = requireNonNull(name, "name can't be null");
+    this.newProjectPrivate = newProjectPrivate;
   }
 
   public String getUuid() {
@@ -46,6 +48,10 @@ public class Organization {
 
   public String getName() {
     return name;
+  }
+
+  public boolean isNewProjectPrivate() {
+    return newProjectPrivate;
   }
 
   @Override
@@ -71,11 +77,12 @@ public class Organization {
       "uuid='" + uuid + '\'' +
       ", key='" + key + '\'' +
       ", name='" + name + '\'' +
+      ", newProjectPrivate=" + newProjectPrivate +
       '}';
   }
 
-  public static Organization from(OrganizationDto organizationDto) {
-    return new Organization(organizationDto.getUuid(), organizationDto.getKey(), organizationDto.getName());
+  public static Organization from(OrganizationDto organizationDto, boolean newProjectPrivate) {
+    return new Organization(organizationDto.getUuid(), organizationDto.getKey(), organizationDto.getName(), newProjectPrivate);
   }
 
 }

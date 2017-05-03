@@ -23,7 +23,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import javax.annotation.Nullable;
 import org.sonar.api.utils.MessageException;
 import org.sonar.ce.queue.CeTask;
@@ -44,7 +43,6 @@ import org.sonar.server.organization.BillingValidationsProxy;
 import org.sonar.server.organization.DefaultOrganizationProvider;
 import org.sonar.server.qualityprofile.QualityProfile;
 
-import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Maps.transformValues;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
@@ -173,9 +171,10 @@ public class LoadReportAnalysisMetadataHolderStep implements ComputationStep {
 
   private Organization toOrganization(String organizationUuid) {
     try (DbSession dbSession = dbClient.openSession(false)) {
-      Optional<OrganizationDto> organizationDto = dbClient.organizationDao().selectByUuid(dbSession, organizationUuid);
-      checkState(organizationDto.isPresent(), "Organization with uuid '{}' can't be found", organizationUuid);
-      return Organization.from(organizationDto.get());
+      OrganizationDto organization = dbClient.organizationDao().selectByUuid(dbSession, organizationUuid)
+        .orElseThrow(() -> new IllegalStateException(format("Organization with uuid '%s' can't be found", organizationUuid)));
+      boolean newProjectPrivate = dbClient.organizationDao().getNewProjectPrivate(dbSession, organization);
+      return Organization.from(organization, newProjectPrivate);
     }
   }
 

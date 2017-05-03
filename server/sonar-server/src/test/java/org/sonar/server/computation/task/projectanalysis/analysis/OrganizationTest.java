@@ -36,7 +36,7 @@ public class OrganizationTest {
   public void build_throws_NPE_if_dto_is_null() {
     expectedException.expect(NullPointerException.class);
 
-    Organization.from(null);
+    Organization.from(null, true);
   }
 
   @Test
@@ -44,7 +44,7 @@ public class OrganizationTest {
     expectedException.expect(NullPointerException.class);
     expectedException.expectMessage("uuid can't be null");
 
-    Organization.from(underTest);
+    Organization.from(underTest, true);
   }
 
   @Test
@@ -54,7 +54,7 @@ public class OrganizationTest {
     expectedException.expect(NullPointerException.class);
     expectedException.expectMessage("key can't be null");
 
-    Organization.from(underTest);
+    Organization.from(underTest, true);
   }
 
   @Test
@@ -64,40 +64,41 @@ public class OrganizationTest {
     expectedException.expect(NullPointerException.class);
     expectedException.expectMessage("name can't be null");
 
-    Organization.from(underTest);
+    Organization.from(underTest, true);
   }
 
   @Test
   public void verify_getters() {
-    Organization organization = Organization.from(underTest.setUuid("uuid").setKey("key").setName("name"));
+    Organization organization = Organization.from(underTest.setUuid("uuid").setKey("key").setName("name"), true);
 
     assertThat(organization.getUuid()).isEqualTo("uuid");
     assertThat(organization.getKey()).isEqualTo("key");
     assertThat(organization.getName()).isEqualTo("name");
+    assertThat(organization.isNewProjectPrivate()).isTrue();
   }
 
   @Test
   public void verify_toString() {
-    Organization organization = Organization.from(underTest.setUuid("uuid").setKey("key").setName("name"));
+    Organization organization = Organization.from(underTest.setUuid("uuid").setKey("key").setName("name"), true);
 
-    assertThat(organization.toString()).isEqualTo("Organization{uuid='uuid', key='key', name='name'}");
+    assertThat(organization.toString()).isEqualTo("Organization{uuid='uuid', key='key', name='name', newProjectPrivate=true}");
   }
 
   @Test
   public void equals_is_based_on_uuid_only() {
-    Organization organization = Organization.from(underTest.setUuid("uuid").setKey("key").setName("name"));
+    Organization organization = Organization.from(underTest.setUuid("uuid").setKey("key").setName("name"), true);
 
-    assertThat(organization).isEqualTo(Organization.from(underTest.setUuid("uuid").setKey("key").setName("name")));
-    assertThat(organization).isEqualTo(Organization.from(underTest.setUuid("uuid").setKey("other key").setName("name")));
-    assertThat(organization).isEqualTo(Organization.from(underTest.setUuid("uuid").setKey("key").setName("other name")));
-    assertThat(organization).isNotEqualTo(Organization.from(underTest.setUuid("other uuid").setKey("key").setName("name")));
+    assertThat(organization).isEqualTo(Organization.from(underTest.setUuid("uuid").setKey("key").setName("name"), true));
+    assertThat(organization).isEqualTo(Organization.from(underTest.setUuid("uuid").setKey("other key").setName("name"), true));
+    assertThat(organization).isEqualTo(Organization.from(underTest.setUuid("uuid").setKey("key").setName("other name"), true));
+    assertThat(organization).isNotEqualTo(Organization.from(underTest.setUuid("other uuid").setKey("key").setName("name"), true));
     assertThat(organization).isNotEqualTo(null);
     assertThat(organization).isNotEqualTo("toto");
   }
 
   @Test
   public void hashcode_is_based_on_uuid_only() {
-    Organization organization = Organization.from(underTest.setUuid("uuid").setKey("key").setName("name"));
+    Organization organization = Organization.from(underTest.setUuid("uuid").setKey("key").setName("name"), true);
 
     assertThat(organization.hashCode()).isEqualTo("uuid".hashCode());
   }

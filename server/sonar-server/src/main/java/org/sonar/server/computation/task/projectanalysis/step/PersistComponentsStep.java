@@ -118,9 +118,9 @@ public class PersistComponentsStep implements ComputationStep {
     dbClient.componentDao().setPrivateForRootComponentUuid(dbSession, projectUuid, isRootPrivate);
   }
 
-  private static boolean isRootPrivate(String rootKey, Map<String, ComponentDto> existingDtosByKeys) {
+  private boolean isRootPrivate(String rootKey, Map<String, ComponentDto> existingDtosByKeys) {
     ComponentDto projectDto = existingDtosByKeys.get(rootKey);
-    return projectDto == null ? false /*FIXME actually use default configured for current organization*/ : projectDto.isPrivate();
+    return projectDto == null ? analysisMetadataHolder.getOrganization().isNewProjectPrivate() : projectDto.isPrivate();
   }
 
   /**

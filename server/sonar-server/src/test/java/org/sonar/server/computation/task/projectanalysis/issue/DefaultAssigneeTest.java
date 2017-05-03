@@ -58,7 +58,7 @@ public class DefaultAssigneeTest {
   @Before
   public void setUp() throws Exception {
     organizationDto = db.organizations().insertForUuid(ORGANIZATION_UUID);
-    analysisMetadataHolder.setOrganization(Organization.from(new OrganizationDto().setUuid(ORGANIZATION_UUID).setKey("Organization key").setName("Organization name")));
+    analysisMetadataHolder.setOrganization(Organization.from(new OrganizationDto().setUuid(ORGANIZATION_UUID).setKey("Organization key").setName("Organization name"), true));
   }
 
   @Test
